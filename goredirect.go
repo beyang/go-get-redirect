@@ -31,7 +31,7 @@ func NewGoGetHandler(mappings []Mapping, defaultHandler http.Handler) http.Handl
 	goGetHandler := pat.New()
 	for _, mapping := range mappings {
 		dst := &mapping.DstRepo
-		handlerFunc := RepoRedirectFunc(dst.Scheme, dst.Hostname, dst.PathPrefix, dst.VCS)
+		handlerFunc := repoRedirectFunc(dst.Scheme, dst.Hostname, dst.PathPrefix, dst.VCS)
 		goGetHandler.Get(fmt.Sprintf("%s{owner:.+}/{repo:.+}", mapping.Prefix), handlerFunc)
 		goGetHandler.Get(fmt.Sprintf("%s{owner:.+}/{repo:.+}/", mapping.Prefix), handlerFunc)
 	}
@@ -50,7 +50,7 @@ func NewGoGetHandler(mappings []Mapping, defaultHandler http.Handler) http.Handl
 }
 
 // Maps from srchost/src-prefix/:owner/:repo -> dsthost/dst-prefix/:owner/:repo
-func RepoRedirectFunc(dstScheme string, dstHost string, dstPath string, vcs string) func(w http.ResponseWriter, req *http.Request) {
+func repoRedirectFunc(dstScheme string, dstHost string, dstPath string, vcs string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		q := req.URL.Query()
 		owner := q.Get(":owner")
@@ -63,19 +63,15 @@ func RepoRedirectFunc(dstScheme string, dstHost string, dstPath string, vcs stri
 			panic("trying to serve go-get redirect for non-go-get query")
 		}
 
-		t, err := template.New("RedirectTemplate").Parse(RedirectTemplate)
+		t, err := template.New("redirectTemplate").Parse(redirectTemplate)
 		if err != nil {
 			panic("error parsing template: " + err.Error())
 		}
 
-		err = t.Execute(w, struct {
-			Root         string
-			VCS          string
-			RedirectRoot string
-		}{
-			fmt.Sprintf("%s/%s/%s", srcHost, owner, repoName),
-			vcs,
-			fmt.Sprintf("%s://%s%s%s/%s", dstScheme, dstHost, dstPath, owner, repoName),
+		err = t.Execute(w, templateParams{
+			Root:         fmt.Sprintf("%s/%s/%s", srcHost, owner, repoName),
+			VCS:          vcs,
+			RedirectRoot: fmt.Sprintf("%s://%s%s%s/%s", dstScheme, dstHost, dstPath, owner, repoName),
 		})
 		if err != nil {
 			http.Error(w, "template execution error", http.StatusInternalServerError)

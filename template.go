@@ -1,6 +1,6 @@
 package goredirect
 
-var RedirectTemplate = `<!DOCTYPE html>
+var redirectTemplate = `<!DOCTYPE html>
 <html>
   <head>
     <title>Repository</title>
@@ -10,3 +10,9 @@ var RedirectTemplate = `<!DOCTYPE html>
     Content: {{.Root}} {{.VCS}} {{.RedirectRoot}}
   </body>
 </html>`
+
+type templateParams struct {
+	Root         string
+	VCS          string
+	RedirectRoot string
+}
