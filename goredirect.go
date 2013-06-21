@@ -40,6 +40,9 @@ func NewGoGetHandler(mappings []Mapping, defaultHandler http.Handler) http.Handl
 	})
 }
 
+// Returns true if mapping input regex prefix-matches request URL
+// (which indicates this mapping applies to this request), otherwise
+// false.
 func (m *Mapping) tryServe(w http.ResponseWriter, req *http.Request) bool {
 	path := req.URL.Path
 	srcHost := strings.Split(req.Host, ":")[0]
