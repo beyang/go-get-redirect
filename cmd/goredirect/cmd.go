@@ -9,7 +9,6 @@ import (
 )
 
 var port = flag.Int("port", 80, "HTTP listen port.  You can set this to something other than 80 for debugging purposes, but it has to be 80 when using go get.")
-var hostname = flag.String("host", "right.here", "Hostname at which this server lives.  This needs to follow the format [name].[top-level domain].")
 
 func main() {
 	flag.Parse()
