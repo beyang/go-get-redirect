@@ -29,10 +29,7 @@ func TestGoGetHandler(t *testing.T) {
 	testcases := [...]outerCase{
 		{
 			Mappings: []Mapping{
-				{
-					Prefix:  "/",
-					DstRepo: RepoNamespace{"git", "https", "github.com", "/"},
-				},
+				{"git", "https", "github.com", NewStringMapperOrBust("/(?P<owner>.+)/(?P<repo>.+)", "/{{.owner}}/{{.repo}}")},
 			},
 			DefaultHandler: nil,
 			InnerCases: []innerCase{

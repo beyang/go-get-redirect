@@ -17,7 +17,7 @@ type stringMapperTestCase struct {
 	Mappings      []stringMapperMapping
 }
 
-func TestStringMapper(t *testing.T) {
+func TestMapString(t *testing.T) {
 	testCases := []stringMapperTestCase{
 		{
 			InputPattern:  "/(?P<first>.+)/(?P<second>.+)/",
@@ -31,18 +31,22 @@ func TestStringMapper(t *testing.T) {
 			OutputPattern: "/newprefix/{{.second}}/{{.first}}",
 			Mappings: []stringMapperMapping{
 				{"/prefix/first/second/", "/newprefix/second/first", nil},
-				{"/prefix/first/", "", errors.New("Error: not matched")},
+				{"/prefix/first/", "", errors.New("Error: prefix not matched")},
+				{"/prefix/first/second/third", "", errors.New("Error: not matched")},
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
+		t.Logf(`Testing "%s" -> "%s"`, testCase.InputPattern, testCase.OutputPattern)
 		m, err := NewStringMapper(testCase.InputPattern, testCase.OutputPattern)
 		if err != nil {
 			t.Fatalf("Unable to create new StringMapper due to error: %s", err.Error())
 		}
 
 		for _, mapping := range testCase.Mappings {
+			t.Logf("   mapping string %s", mapping.Input)
+
 			actualOutput, err := m.MapString(mapping.Input)
 			if err == nil && mapping.Err == nil {
 				if actualOutput != mapping.Output {
