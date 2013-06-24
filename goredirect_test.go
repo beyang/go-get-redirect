@@ -30,7 +30,13 @@ func TestGoGetHandler(t *testing.T) {
 		{
 			// Simple case
 			Mappings: []Mapping{
-				{"git", "https", "github.com", NewStringMapperOrBust("", "/path-to-my-repo/on-github")},
+				{
+					DstVCS:                 "git",
+					DstScheme:              "https",
+					DstHostname:            "github.com",
+					SrcHostname:            "",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("", "/path-to-my-repo/on-github"),
+				},
 			},
 			DefaultHandler: nil,
 			InnerCases: []innerCase{
@@ -63,11 +69,41 @@ func TestGoGetHandler(t *testing.T) {
 		{
 			// Advanced cases
 			Mappings: []Mapping{
-				{"git", "https", "github.com", NewStringMapperOrBust("/customPath", "/path/to/custom")},
-				{"git", "https", "github.com", NewStringMapperOrBust("/repo(?P<repo>.+)/user(?P<owner>.+)", "/{{.owner}}/{{.repo}}")},
-				{"hg", "https", "bitbucket.org", NewStringMapperOrBust("/hg/(?P<owner>.+)/(?P<repo>.+)", "/{{.owner}}/{{.repo}}")},
-				{"git", "https", "github.com", NewStringMapperOrBust("/(?P<owner>.+)/(?P<repo>.+)\\.git", "/{{.owner}}/{{.repo}}")},
-				{"git", "https", "github.com", NewStringMapperOrBust("/(?P<owner>.+)/(?P<repo>.+)", "/{{.owner}}/{{.repo}}")},
+				{
+					DstVCS:                 "git",
+					DstScheme:              "https",
+					DstHostname:            "github.com",
+					SrcHostname:            "customHost.com",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("/customPath", "/path/to/custom"),
+				},
+				{
+					DstVCS:                 "git",
+					DstScheme:              "https",
+					DstHostname:            "github.com",
+					SrcHostname:            "",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("/repo(?P<repo>.+)/user(?P<owner>.+)", "/{{.owner}}/{{.repo}}"),
+				},
+				{
+					DstVCS:                 "hg",
+					DstScheme:              "https",
+					DstHostname:            "bitbucket.org",
+					SrcHostname:            "",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("/hg/(?P<owner>.+)/(?P<repo>.+)", "/{{.owner}}/{{.repo}}"),
+				},
+				{
+					DstVCS:                 "git",
+					DstScheme:              "https",
+					DstHostname:            "github.com",
+					SrcHostname:            "",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("/(?P<owner>.+)/(?P<repo>.+)\\.git", "/{{.owner}}/{{.repo}}"),
+				},
+				{
+					DstVCS:                 "git",
+					DstScheme:              "https",
+					DstHostname:            "github.com",
+					SrcHostname:            "",
+					SrcToDstRepoPathMapper: NewStringMapperOrBust("/(?P<owner>.+)/(?P<repo>.+)", "/{{.owner}}/{{.repo}}"),
+				},
 			},
 			DefaultHandler: nil,
 			InnerCases: []innerCase{
@@ -102,14 +138,14 @@ func TestGoGetHandler(t *testing.T) {
 				{
 					URL:             "http://myhost.com/customPath?go-get=1",
 					ExpHTTPStatus:   http.StatusOK,
-					ExpRoot:         "myhost.com/customPath",
+					ExpRoot:         "customHost.com/customPath",
 					ExpVCS:          "git",
 					ExpRedirectRoot: "https://github.com/path/to/custom",
 				},
 				{
 					URL:             "http://myhost.com/customPath/subpkg/path?go-get=1",
 					ExpHTTPStatus:   http.StatusOK,
-					ExpRoot:         "myhost.com/customPath",
+					ExpRoot:         "customHost.com/customPath",
 					ExpVCS:          "git",
 					ExpRedirectRoot: "https://github.com/path/to/custom",
 				},

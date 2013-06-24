@@ -11,6 +11,7 @@ type Mapping struct {
 	DstVCS                 string
 	DstScheme              string
 	DstHostname            string
+	SrcHostname            string // if empty, uses hostname in HTTP request
 	SrcToDstRepoPathMapper *StringMapper
 }
 
@@ -45,7 +46,12 @@ func NewGoGetHandler(mappings []Mapping, defaultHandler http.Handler) http.Handl
 // false.
 func (m *Mapping) tryServe(w http.ResponseWriter, req *http.Request) bool {
 	path := req.URL.Path
-	srcHost := strings.Split(req.Host, ":")[0]
+	var srcHost string
+	if m.SrcHostname == "" {
+		srcHost = strings.Split(req.Host, ":")[0]
+	} else {
+		srcHost = m.SrcHostname
+	}
 
 	dstRepoPath, srcRepoPath, _, err := m.SrcToDstRepoPathMapper.MapStringPrefix(path)
 	if err != nil {
