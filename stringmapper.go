@@ -12,7 +12,7 @@ type StringMapper struct {
 	OutputTemplate *template.Template
 }
 
-func NewStringMapperOrBust(input string, output string) *StringMapper {
+func MustGetNewStringMapper(input string, output string) *StringMapper {
 	if s, err := NewStringMapper(input, output); err == nil {
 		return s
 	} else {
