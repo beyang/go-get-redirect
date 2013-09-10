@@ -1,6 +1,10 @@
 Package go-get-redirect
 ===============
 
+[![xrefs](https://sourcegraph.com/api/repos/github.com/beyang/go-get-redirect/badges/xrefs.png)](https://sourcegraph.com/github.com/beyang/go-get-redirect)
+[![funcs](https://sourcegraph.com/api/repos/github.com/beyang/go-get-redirect/badges/funcs.png)](https://sourcegraph.com/github.com/beyang/go-get-redirect)
+[![top func](https://sourcegraph.com/api/repos/github.com/beyang/go-get-redirect/badges/top-func.png)](https://sourcegraph.com/github.com/beyang/go-get-redirect)
+
 Package goredirect enables you to redirect `go get` to map from one
 set of repository URLs to another. You can use it to create a
 standalone server or wrap an existing one.
